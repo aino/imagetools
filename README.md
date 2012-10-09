@@ -9,6 +9,12 @@ $.fn.imageLoad
 - works for images that are already loaded
 - provides fallbacks for browser bugs (f.ex adblock in chrome)
 
+Example::
+
+    $('img').imageLoad(function(e) {
+        // loaded
+    });
+
 $.fn.imageScale
 ---------------
 - gives you 6 different cropping options: true, false, width, height, landscape, portrait
@@ -17,5 +23,18 @@ $.fn.imageScale
 - takes percent or pixels for responsive layouts
 - creates a wrapper that hides overflowing parts if you crop the image
 - never stretches an image unproportionally
+
+Example::
+
+    $('img').imageScale({
+        width: 200,
+        height: 200,
+        crop: true,
+        complete: function() {
+            // loaded and scaled
+        }
+    });
+
+--
 
 MIT license. Made by aino.com
