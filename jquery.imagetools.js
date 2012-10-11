@@ -52,6 +52,7 @@ MIT license. Made by aino.com
 
                 if ( this.nodeName != 'IMG' ) {
                     $(this).find('img').imageLoad( callback );
+                    return;
                 }
 
                 if ( !ready.call(this) ) {
@@ -75,8 +76,6 @@ MIT license. Made by aino.com
         imageScale: function( options ) {
 
             options = $.extend( {
-                width: null,
-                height: null,
                 crop: false,
                 position: '50% 0',
                 upscale: false,
@@ -86,10 +85,8 @@ MIT license. Made by aino.com
             return this.each(function() {
 
                 var img = this,
-                    $img = $(img);
-
-                options.width = options.width || '100%';
-                options.height = options.height || '100%';
+                    $img = $(img),
+                    rperc = /%/;
 
                 if ( !this.complete || !this.width || !this.height || !this.naturalWidth || !this.naturalHeight ) {
                     $img.css('visibility', 'hidden').imageLoad( function() {
@@ -100,14 +97,22 @@ MIT license. Made by aino.com
 
                 $img.hide();
 
-                var loop = ['width', 'height'],
+                var ow = options.width,
+                    oh = options.height,
+                    loop = ['width', 'height'],
                     $parent = $img.parent(),
                     nwidth = img.naturalWidth,
-                    nheight = img.naturalHeight;
+                    nheight = img.naturalHeight,
+                    ch = 0, cw = 0;
 
-                if ( /%/.test( [options.width, options.height ].join('')) ) {
+                if ( !ow && !oh ) {
+                    $img.show().css('vibility', 'visible');
+                    options.complete.call(img);
+                    return;
+                }
+
+                if ( rperc.test( [ow, oh ].join('')) ) {
                     var $tmf = $parent.data('imagewrapper') ? $parent.parent() : $parent,
-                        g = {},
                         overflow,
                         $body = $(document.body);
 
@@ -119,31 +124,24 @@ MIT license. Made by aino.com
                             overflow: 'hidden'
                         });
 
-                        g.width = $body.width();
-
-                        // window.height is most like what we want here
-                        g.height = $(window).height();
+                        cw = $body.width();
+                        ch = $(window).height(); // window.height is most like what we want here
 
                     } else {
-                        g.width = $tmf.width();
-                        g.height = $tmf.height();
+                        cw = $tmf.width();
+                        ch = $tmf.height();
                     }
-
-                    $.each( loop, function(i, m) {
-                        if ( /%$/.test( options[m] ) ) {
-                            options[m] = g[m] * parseInt( options[m], 10 ) / 100;
-                        }
-                    });
 
                     if ( overflow ) {
                         $body.css('overflow', overflow);
                     }
+
+                    ow = rperc.test(ow) ? (parseInt(ow,10)/100)*cw : ow;
+                    oh = rperc.test(oh) ? (parseInt(oh,10)/100)*ch : oh;
                 }
 
-                // ratio-height.
-                if ( !options.height ) {
-                    options.height = options.width * ( nheight / nwidth );
-                }
+                ow = ow || img.naturalWidth * ( oh / img.naturalHeight );
+                oh = oh || img.naturalHeight * ( ow / img.naturalWidth );
 
                 var parent = $parent.get(0),
                     $wrap = $parent.data('imagewrapper') ? $parent : $('<div>').css({
@@ -151,8 +149,8 @@ MIT license. Made by aino.com
                         overflow: 'hidden'
                     }).addClass('imagescale').data('imagewrapper', true),
 
-                    newWidth = options.width / nwidth,
-                    newHeight = options.height / nheight,
+                    newWidth = ow / nwidth,
+                    newHeight = oh / nheight,
                     min = Math.min( newWidth, newHeight ),
                     max = Math.max( newWidth, newHeight ),
                     cropMap = {
@@ -175,8 +173,8 @@ MIT license. Made by aino.com
                 $(this).width( newWidth ).height( newHeight );
 
                 $wrap.css({
-                    width:  options.width,
-                    height: options.height,
+                    width:  ow,
+                    height: oh,
                     position: 'relative'
                 });
 
@@ -225,8 +223,8 @@ MIT license. Made by aino.com
                 // apply position
                 $(this).css({
                     position : 'absolute',
-                    top :  getPosition(pos.top, 'height', options.height),
-                    left : getPosition(pos.left, 'width', options.width)
+                    top :  getPosition(pos.top, 'height', oh),
+                    left : getPosition(pos.left, 'width', ow)
                 });
 
                 $wrap.css('visibility', 'visible');
@@ -237,7 +235,7 @@ MIT license. Made by aino.com
 
                 $img.show().css('visibility', 'visible');
 
-                options.complete.call($wrap.get(0), img);
+                options.complete.call(img, $wrap.get(0));
 
             });
 

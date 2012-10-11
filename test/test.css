@@ -1,0 +1,23 @@
+*{margin:0;padding:0}
+html,body{background:#eeeee8;font:13px/16px arial,sans-serif;color:#444}
+body{width:600px;margin:0 0 100px 100px}
+h2{border-top:1px solid #222;padding:8px 0;font-size:18px;line-height:18px;cursor:pointer;
+    color:#222;margin-top:20px;letter-spacing:-.5px;padding-right:100px;position:relative;padding-left:6px}
+h2 span{position:absolute;top:8px;right:6px;font-size:11px;font-weight:normal;letter-spacing:0;color:#998}
+h2.pass{background:#b5d3be}
+h2.pass span{color:#fff}
+h2.fail{background:#dc8b8b}
+h2.fail span{color:#fff}
+p{padding:4px 8px;margin:2px 2px 0 0;display:inline-block;border-radius:3px;font-size:12px}
+p.log{ padding:0; display:block; margin-bottom:4px;font-size:12px;font-family:monaco,monospace}
+p.ok{background:#b5d3be}
+p.ok:after{content:" ✓";}
+p.fail{background:#dc8b8b}
+p.fail:after{content:" ✖";}
+p.warning{background:#dcc67b}
+p.warning:after{content:" !";}
+.tests{display:none}
+.tests.open{display:block}
+table{width:100%;border-bottom:1px solid #ccccca;border-right:1px solid #ccccca;border-collapse:collapse}
+td{border-top:1px solid #ccccca;border-left:1px solid #ccccca;padding:2px 4px;font-size:11px;}
+td.cache{background:rgba(0,0,0,.1)}
