@@ -16,7 +16,7 @@ $.fn.imageScale
 - gives you 6 different cropping options: true, false, width, height, landscape, portrait
 - lets you upscale images
 - lets you position the image using standard CSS positioning
-- takes percent or pixels for responsive layouts
+- takes pixels or percents for responsive layouts
 - creates a wrapper that hides overflowing parts if you crop the image
 - never stretches an image unproportionally
 
@@ -30,6 +30,9 @@ MIT license. Made by aino.com
 /*global jQuery, window, document, Image */
 
 (function($) {
+
+    var rperc = /%/;
+    var mins = 'minWidth minHeight maxWidth maxHeight'.split(' ');
 
     $.extend($.fn, {
 
@@ -85,8 +88,7 @@ MIT license. Made by aino.com
             return this.each(function() {
 
                 var img = this,
-                    $img = $(img),
-                    rperc = /%/;
+                    $img = $(img);
 
                 if ( !this.complete || !this.width || !this.height || !this.naturalWidth || !this.naturalHeight ) {
                     $img.css('visibility', 'hidden').imageLoad( function() {
@@ -97,9 +99,12 @@ MIT license. Made by aino.com
 
                 $img.hide();
 
+                $.each(mins, function(i, prop) {
+                    $img.css(prop, (/min/.test(prop) ? '0' : 'none'));
+                });
+
                 var ow = options.width,
                     oh = options.height,
-                    loop = ['width', 'height'],
                     $parent = $img.parent(),
                     nwidth = img.naturalWidth,
                     nheight = img.naturalHeight,
@@ -118,11 +123,10 @@ MIT license. Made by aino.com
 
                     // special case, if measured against body we need to remove scrollbars first for webkit
                     if ( $tmf.get(0) === document.body ) {
-                        overflow = $body.css('overflow');
+                        
+                        overflow = document.body.style.overflow;
 
-                        $body.css({
-                            overflow: 'hidden'
-                        });
+                        $body.css('overflow', 'hidden');
 
                         cw = $body.width();
                         ch = $(window).height(); // window.height is most like what we want here
@@ -134,6 +138,10 @@ MIT license. Made by aino.com
 
                     if ( overflow ) {
                         $body.css('overflow', overflow);
+                    } else {
+                        $body.attr('style', function(i, style) {
+                            return style.replace(/overflow[^;]+;?/g, '');
+                        });
                     }
 
                     ow = rperc.test(ow) ? (parseInt(ow,10)/100)*cw : ow;
@@ -238,7 +246,6 @@ MIT license. Made by aino.com
                 options.complete.call(img, $wrap.get(0));
 
             });
-
         }
     });
 }(jQuery));
