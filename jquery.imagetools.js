@@ -1,5 +1,7 @@
 /*
 
+2012-10-27
+
 jQuery.imagetools
 Provides two helpers, a proper imageLoad method and a fully featured imageScale method
 
@@ -59,16 +61,18 @@ MIT license. Made by aino.com
                 }
 
                 if ( !ready.call(this) ) {
-                    $(this).load(function(e) {
+                    $(this).load(function onload(e) {
+                        console.log('onload')
                         window.setTimeout((function(img) {
                             return function() {
                                 if ( !ready.call( img ) && !$(img).data('reload') ) {
                                     $(new Image()).attr('src', img.src).data('reload', true).imageLoad( callback );
                                     return;
                                 }
+                                $(img).unbind('load', onload);
                                 complete.call(img, e);
                             };
-                        }(this)),1);
+                        }(this)), 4);
                     });
                 } else {
                     complete.call(this, {});
